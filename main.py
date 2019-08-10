@@ -5,7 +5,7 @@
 # and imaging devices typically used in research 
 # labs working with Deep Learning. 
 
-# I have used EEG sensor data as  reference.
+# I have used EEG sensor data as reference.
 
 # Parameters:
 # 1. Duration of data generation in seconds => timeDuration
@@ -18,10 +18,13 @@ import random
 import sched, time
 import datetime
 
-import blosture as blos
+import blos
+from blosture import firescale
+
+fireinstance = firescale("7VFOAzeTJT","5d4aae0a26202a538ceee98e")
 
 # Multithreaded execution of listner will go to 
-# Blosture's Library
+# Firescale's Library
 from multiprocessing import Pool
 
 timeDuration = sys.argv[1]
@@ -42,22 +45,35 @@ def addSecs(tm, secs):
     fulldate = fulldate + datetime.timedelta(seconds=secs)
     return fulldate.time()
 
+# Start and stop time objects for emitting data from simulator.
 startTime = datetime.datetime.now().time()
-print startTime
-# stopTime = startTime + datetime.timedelta(10)
 stopTime = addSecs(startTime, int(timeDuration))
 
-s = sched.scheduler(time.time, time.sleep)
-def do_something(sc): 
-    # Calculate a random vector
-    vector = np.random.uniform(low=-100.000, high=100.000, size=(numerOfRandomVariables,))
-    pool = Pool(processes=1)              # Start a worker processes.
-    result = pool.apply_async(blos.listen, [vector], )
-    # print vector
-    if(datetime.datetime.now().time() > stopTime):
-        blos.release_listener()
-    	return
-    s.enter(.1, 1, do_something, (sc,))
+############## Scheduler based Test:
+# s = sched.scheduler(time.time, time.sleep)
+# def do_something(sc): 
+#     # Calculate a random vector and push to Firescale instance.
+#     vector = np.random.uniform(low=-100.000, high=100.000, size=(numerOfRandomVariables,))
+#     fireinstance.push(vector)
 
-s.enter(.4, 1, do_something, (s,))
-s.run()
+#     if(datetime.datetime.now().time() > stopTime):
+#         fireinstance.release()
+#     	return
+#     s.enter(.1, 1, do_something, (sc,))
+
+# s.enter(.4, 1, do_something, (s,))
+# s.run()
+
+# import time
+
+##############  While Loop based test:
+t_end = time.time() + 10 
+while time.time() < t_end:
+    # do whatever you do
+    vector = np.random.uniform(low=-100.000, high=100.000, size=(numerOfRandomVariables,))
+    fireinstance.push(vector)
+    # blos.listen(vector)
+
+############## Single vector based test:
+# vector = np.random.uniform(low=-100.000, high=100.000, size=(numerOfRandomVariables,))
+# fireinstance.push(vector)

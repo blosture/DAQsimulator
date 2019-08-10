@@ -6,8 +6,18 @@ try:
 except:
     import http.client as httplib
 
+import time
+import sys
+
+INTERNET_AVAILABLE = False
+
+
+
 def have_internet():
-    conn = httplib.HTTPConnection("www.google.com", timeout=5)
+    return INTERNET_AVAILABLE
+
+def request_goog_head():
+    conn = httplib.HTTPConnection("www.google.com", timeout=2)
     try:
         conn.request("HEAD", "/")
         conn.close()
@@ -18,7 +28,7 @@ def have_internet():
 
 c = ntplib.NTPClient()
 
-def fetch_time_():
+def fetch_time_sys_ntp():
     if(have_internet()):
         response = c.request('europe.pool.ntp.org', version=3)
         NTPtime = datetime.datetime.utcfromtimestamp(response.tx_time)
@@ -41,3 +51,19 @@ def fetch_NTP():
 
 def fetch_system_time():
     return str(datetime.datetime.now())
+
+# try:
+#     while True:
+#         status = request_goog_head()
+#         if status:
+#             INTERNET_AVAILABLE = True
+#             print "INTERNET_AVAILABLE = True"
+#         else:
+#             INTERNET_AVAILABLE = False
+#             print "INTERNET_AVAILABLE = False"
+#         time.sleep(5)
+# except KeyboardInterrupt:
+#     print("Quitting the program.")
+# except:
+#     print("Unexpected error: ")
+#     raise
