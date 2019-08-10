@@ -8,14 +8,11 @@ import sys
 import numpy as np
 import requests
 import random
-import sched, time
+import time
 import datetime
-import requests
 import json
 import util
-import json
 import os
-
 
 endpoint = "http://localhost:4000/api/listen"
 # endpoint = "http://ec2-18-217-87-55.us-east-2.compute.amazonaws.com:4000/api/listen"
